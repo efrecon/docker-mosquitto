@@ -27,5 +27,6 @@ container.
 
 Builds will happen automatically for all current and future versions of the
 official [image](https://hub.docker.com/_/eclipse-mosquitto/) by the way of the
-scripts in [hooks/](hooks/). This means that versioning and taggine of these
-images will match the official Docker library.
+scripts in [hooks/](hooks/). This means that versioning and tagging of these
+images will match the official Docker library. Currently, version discovery
+uses scraping of the docker hub.

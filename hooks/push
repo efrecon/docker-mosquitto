@@ -28,7 +28,7 @@ IMG=$(basename $DOCKER_REPO)
 for tag in $tags; do
     btag=$(echo "$tag" | grep -v "rc")
     if [ -n "$btag" ]; then
-        echo "============== Building ${IMG}:$btag"
-        docker push ${DOCKER_REPO}:$btag .
+        echo "============== Pushing ${IMG}:$btag"
+        docker push ${DOCKER_REPO}:$btag
     fi
 done
