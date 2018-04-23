@@ -1,0 +1,34 @@
+#!/bin/bash
+
+im="eclipse-mosquitto"
+
+if [ -z "$(echo "$im" | grep -o '/')" ]; then
+    hub="https://hub.docker.com/r/library/$im/tags/"
+else
+    hub="https://hub.docker.com/r/$im/tags/"
+fi
+
+resp="Page Not Found"
+if [ -z "$(command -v curl)" ]; then
+    resp=$(wget -q -O - $hub)
+else
+    resp=$(curl -sL $hub)
+fi
+err=$(echo "$resp"|grep -o "Page Not Found")
+
+tags=
+if [ -n "$err" ]; then
+    echo "Cannot find image $im!"
+    exit
+else
+    tags="$(echo "$resp"|sed  -e 's|}|\n|g' -e 's|{|\n|g'|grep '"result"'|sed -e 's|,|\n|g'|cut -d '[' -f2|cut -d ']' -f1|sed  '/"tags":/d'|sed -e 's|"||g')"
+fi    
+
+IMG=$(basename $DOCKER_REPO)
+for tag in $tags; do
+    btag=$(echo "$tag" | grep -v "rc")
+    if [ -n "$btag" ]; then
+        echo "============== Building ${IMG}:$btag"
+        docker build --build-arg MOSQUITTO_VERSION=$btag -t ${DOCKER_REPO}:$btag .
+    fi
+done
