@@ -9,7 +9,7 @@ to set their value through creating an environment variable starting with
 `MOSQUITTO_` and continuing with the same name as the option, but in upper case.
 So, for example, to turn on persistence, you would set the variable
 `MOSQUITTO_PERSISTENCE` to `true` and set the variable
-`MOSQUITTO_PERSISTENCE_PATH` to `/mosquitto/data/`.
+`MOSQUITTO_PERSISTENCE_LOCATION` to `/mosquitto/data/`.
 
 For security reasons, you would probably not want to expose the value of secrets
 using environment variables. A possible workaround is to copy the default
