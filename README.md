@@ -23,7 +23,7 @@ which this image is based. The implementation is currently able to detect the
 following sections:
 
 * `default` will contain options for the default listener.
-* `listener` will contain options for an additional listener. There is currently
+* `extra` will contain options for an additional listener. There is currently
   no support for further listeners.
 * `persistence` will contain options for persistence.
 * `logging` will contain options for logging.
@@ -31,8 +31,17 @@ following sections:
 * `bridges` will contain options for bridging mosquitto installations together
   for improved scalability.
 
-To make use of this sectioning of the configuration file, you will have to
-specify an include directory.  This can be achieved through using a
+For example, the content of the `default` section starts with the following
+header in the file (up to the next header):
+
+```
+# =================================================================
+# Default listener
+# =================================================================
+```
+
+To start making use of this sectioning of the configuration file, you will
+**have** to specify an include directory.  This can be achieved through using a
 configuration file with a given value for `include_dir`, or by specifying the
 environment variable `MOSQUITTO_INCLUDE_DIR`. Whenever the directory is
 specified, the main configuration file will be automatically sliced into a

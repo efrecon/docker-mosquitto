@@ -11,7 +11,7 @@ CONFIG=/mosquitto/config/mosquitto.conf
 # be created. Pattern matching will not respect case and will occur against the
 # content of the lines of the comment at the beginning of the section (without
 # the comment character).
-MATCHER="default?listener* default extra?listener* listener *persist* persistence *log* logging *secur* security *bridge* bridges"
+MATCHER="default?listener* default extra?listener* extra *persist* persistence *log* logging *secur* security *bridge* bridges"
 
 # First pass: Catch all MOSQUITTO_ prefixed environment variables and match them
 # in configure file, do not take care of sections variables, i.e. variables
