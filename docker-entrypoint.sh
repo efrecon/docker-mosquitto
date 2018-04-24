@@ -2,7 +2,15 @@
 
 set -e
 
+# Default location of the configuration. This matches the location used in the
+# official image. We might want to provide options to specify this from the
+# outside.
 CONFIG=/mosquitto/config/mosquitto.conf
+# Sub-section detection matching rules. These come in pairs, first a glob-style
+# matching pattern and then the name of the sub-section configuration that will
+# be created. Pattern matching will not respect case and will occur against the
+# content of the lines of the comment at the beginning of the section (without
+# the comment character).
 MATCHER="default?listener* default extra?listener* listener *persist* persistence *log* logging *secur* security *bridge* bridges"
 
 # First pass: Catch all MOSQUITTO_ prefixed environment variables and match them
