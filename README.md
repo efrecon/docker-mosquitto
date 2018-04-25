@@ -1,15 +1,19 @@
 # mosquitto
 
-These images behaves almost exacly as the official Eclipse mosquitto server
-images, while providing easy configuration of most parameters through
+These images behaves almost exacly as the official Eclipse [mosquitto] server
+[images], while providing easy configuration of most parameters through
 environment variables.
+
+  [mosquitto]: https://eclipse.org/mosquitto
+  [images]: https://hub.docker.com/_/eclipse-mosquitto/
 
 ## Simpler Cases
 
 For all known options present in the default configuration file, it is possible
 to set their value through creating an environment variable starting with
 `MOSQUITTO_` and continuing with the same name as the option, but in upper case.
-So, for example, to change the retry interval to 10 seconds, you would set the
+So, for example, to change the retry interval to 10 seconds, an interval
+controlled by the configuration option `retry_interval`, you would set the
 variable `MOSQUITTO_RETRY_INTERVAL` to `10`.
 
 ## Sub-Sectioning
@@ -34,21 +38,20 @@ following sections:
 For example, the content of the `default` section starts with the following
 header in the file (up to the next header):
 
-```
+```configure
 # =================================================================
 # Default listener
 # =================================================================
 ```
 
-To start making use of this sectioning of the configuration file, you will
-**have** to specify an include directory.  This can be achieved through using a
-configuration file with a given value for `include_dir`, or by specifying the
-environment variable `MOSQUITTO_INCLUDE_DIR`. Whenever the directory is
-specified, the main configuration file will be automatically sliced into a
-number of configuration files, named as described above and created in the
-include directory. A backup of the original configuration file will be made and
-a new configuration file where all sub-sections have been removed will be
-created.
+To start making use of this sectioning of the configuration file, you **have**
+to specify an include directory.  This can be achieved using a configuration
+file with a given value for `include_dir`, or by specifying the environment
+variable `MOSQUITTO_INCLUDE_DIR`. Whenever the directory is specified, the main
+configuration file will be automatically sliced into a number of configuration
+files, named as described above and created in the include directory. A backup
+of the original configuration file will be made and a new configuration file
+where all sub-sections have been removed will be created.
 
 In this context, it becomes possible to use specially crafted environment
 variables to address options in the different sub-sections. These variables
@@ -73,6 +76,53 @@ on persistence:
   `MOSQUITTO__PERSISTENCE__PERSISTENCE_LOCATION`, respectively.
 
 In general, sub-sectioning is more deterministic.
+
+## Using from Compose
+
+These images makes configuration much more visible (and flexible) from compose
+files whenever deploying mosquitto containers.  Below is a somewhat constructed
+example:
+
+```yaml
+volumes:
+  persistence:
+    driver: local
+
+services:
+  mosquitto:
+    image: efrecon/mosquitto:1.4.12
+    volumes:
+      - persistence:/mosquitto/data
+    environment:
+      - MOSQUITTO_INCLUDE_DIR=/mosquitto/config/sections/
+      - MOSQUITTO__PERSISTENCE__AUTOSAVE_ON_CHANGES=true
+      - MOSQUITTO__PERSISTENCE__AUTOSAVE_INTERVAL=100
+      - MOSQUITTO__PERSISTENCE__PERSISTENCE=true
+      - MOSQUITTO__PERSISTENCE__PERSISTENCE_LOCATION=/mosquitto/data/
+      - MOSQUITTO__LOGGING__LOG_DEST=stderr
+    ports:
+      -
+        target: 1883
+        published: 1883
+        protocol: tcp
+        mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "10"
+    deploy:
+      restart_policy:
+        delay: 10s
+        max_attempts: 10
+        window: 60s
+      replicas: 1
+```
+
+Jumping into the container with `docker exec` would show a modified version of
+the regular configuration file at `/mosquitto/config/mosquitto.conf` and several
+configuration files in the directory `/mosquitto/config/sections/`, one for each
+of the sections supported by this implementation.
 
 ## Complex Cases
 
@@ -101,17 +151,20 @@ container.
 ## Automated Builds
 
 Builds will happen automatically for all current and future versions of the
-official [image](https://hub.docker.com/_/eclipse-mosquitto/) by the way of the
-scripts in [hooks/](hooks/). This means that versioning and tagging of these
-images will match the official Docker library. Currently, version discovery
-uses scraping of the docker hub.
+official [images] by the way of the scripts in the [hooks] directory. This means
+that versioning and tagging of these images will match the official Docker
+library. Currently, version discovery uses scraping of the docker hub.
+
+  [hooks]: https://github.com/efrecon/docker-mosquitto/tree/master/hooks
 
 ## Implemenation
 
-All substitution and slicing occurs from
-[docker-entrypoint.sh](docker-entrypoint.sh). Substitution in the various
-configuration files occurs at the shell level. Slicing the main configuration
-file into sub-sections required a more complex algorithm and is implemented in
-the Tcl script [slicer.tcl](slicer.tcl). The script is called twice, once for
+All substitution and slicing occurs from [docker-entrypoint.sh]. Substitution in
+the various configuration files occurs at the shell level. Slicing the main
+configuration file into sub-sections required a more complex algorithm and is
+implemented in the Tcl script [slicer.tcl]. The script is called twice, once for
 detecting the location of the include directory, and a second time to create the
 various sub-section files.
+
+  [docker-entrypoint.sh]: https://github.com/efrecon/docker-mosquitto/blob/master/docker-entrypoint.sh
+  [slicer.tcl]: https://github.com/efrecon/docker-mosquitto/blob/master/slicer.tcl
