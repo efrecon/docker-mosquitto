@@ -3,26 +3,40 @@
 im="eclipse-mosquitto"
 
 if [ -z "$(echo "$im" | grep -o '/')" ]; then
-    hub="https://hub.docker.com/r/library/$im/tags/"
+    hub="https://registry.hub.docker.com/v2/repositories/library/$im/tags/"
 else
-    hub="https://hub.docker.com/r/$im/tags/"
+    hub="https://registry.hub.docker.com/v2/repositories/$im/tags/"
 fi
 
-resp="Page Not Found"
+# Modified from
+# http://www.googlinux.com/list-all-tags-of-docker-image/index.html to support
+# wget/curl and not rely on jq
+echo "============== Figuring out all tags for $im"
+
+# Get number of pages
 if [ -z "$(command -v curl)" ]; then
-    resp=$(wget -q -O - $hub)
+    first=$(wget -q -O - $hub)
 else
-    resp=$(curl -sL $hub)
+    first=$(curl -sL $hub)
 fi
-err=$(echo "$resp"|grep -o "Page Not Found")
+count=$(echo $first | sed -E 's/\{\s*"count":\s*([0-9]+).*/\1/')
+pagination=$(echo $first | grep -Eo '"name":\s*"[a-zA-Z0-9_.-]+"' | wc -l)
+pages=$(expr $count / $pagination + 1)
 
+# Get all tags one page after the other
 tags=
-if [ -n "$err" ]; then
-    echo "Cannot find image $im!"
-    exit
-else
-    tags="$(echo "$resp"|sed  -e 's|}|\n|g' -e 's|{|\n|g'|grep '"result"'|sed -e 's|,|\n|g'|cut -d '[' -f2|cut -d ']' -f1|sed  '/"tags":/d'|sed -e 's|"||g')"
-fi    
+i=0
+while [ $i -le $pages ] ;
+do
+    i=$(expr $i + 1)
+    if [ -z "$(command -v curl)" ]; then
+        page=$(wget -q -O - "$hub?page=$i")
+    else
+        page=$(curl -sL "$hub?page=$i")
+    fi
+    ptags=$(echo $page | grep -Eo '"name":\s*"[a-zA-Z0-9_.-]+"' | sed -E 's/"name":\s*"([a-zA-Z0-9_.-]+)"/\1/')
+    tags="${ptags} $tags"
+done
 
 IMG=$(basename $DOCKER_REPO)
 for tag in $tags; do
