@@ -2,10 +2,12 @@
 
 These images behaves almost exacly as the official Eclipse [mosquitto] server
 [images], while providing easy configuration of most parameters through
-environment variables.
+environment variables. They are also ready for TLS connections using [official]
+root certificates out-of-the-box.
 
   [mosquitto]: https://eclipse.org/mosquitto
   [images]: https://hub.docker.com/_/eclipse-mosquitto/
+  [official]: https://wiki.mozilla.org/CA/Included_Certificates
 
 ## Simpler Cases
 
