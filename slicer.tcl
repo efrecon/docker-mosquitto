@@ -160,7 +160,7 @@ foreach fpath $argv {
     } else {
         set backup ${fpath}.[string trimleft [dict get $::options -backup] .]
         puts stderr "Keeping backup at $backup"
-        file rename $fpath $backup
+        file rename -force -- $fpath $backup
         sliceConf $backup $fpath $dir
     }
 }
