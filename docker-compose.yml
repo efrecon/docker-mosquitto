@@ -1,0 +1,35 @@
+version: "3.4"
+
+volumes:
+  persistence:
+    driver: local
+
+services:
+  mosquitto:
+    image: efrecon/mosquitto:1.5.5
+    volumes:
+      - persistence:/mosquitto/data
+    environment:
+      - MOSQUITTO_INCLUDE_DIR=/mosquitto/config/sections/
+      - MOSQUITTO__PERSISTENCE__AUTOSAVE_ON_CHANGES=true
+      - MOSQUITTO__PERSISTENCE__AUTOSAVE_INTERVAL=100
+      - MOSQUITTO__PERSISTENCE__PERSISTENCE=true
+      - MOSQUITTO__PERSISTENCE__PERSISTENCE_LOCATION=/mosquitto/data/
+      - MOSQUITTO__LOGGING__LOG_DEST=stderr
+    ports:
+      -
+        target: 1883
+        published: 1883
+        protocol: tcp
+        mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "10"
+    deploy:
+      restart_policy:
+        delay: 10s
+        max_attempts: 10
+        window: 60s
+      replicas: 1
