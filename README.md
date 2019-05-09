@@ -92,7 +92,7 @@ volumes:
 
 services:
   mosquitto:
-    image: efrecon/mosquitto:1.4.12
+    image: efrecon/mosquitto:1.5.5
     volumes:
       - persistence:/mosquitto/data
     environment:
@@ -138,6 +138,8 @@ be located at `/mosquitto/config/mosquitto.conf`.
 
 ## Security
 
+### Secrets
+
 For security reasons, you would probably not want to expose the value of secrets
 using environment variables. A possible workaround is to copy the default
 configuration file inside your own project, modify sensitive data in the file
@@ -149,6 +151,65 @@ to other files than the main configuration file, so in most cases you will be
 safe to point at these files through environment variables; while still making
 sure that the files containing secret information are present within the
 container.
+
+### TLS
+
+In order to provide TLS encryption, you will have to add an extra listener to
+mosquitto. Provided you have official key and cert for a host, you could place
+them in a volume (`tls` in the example below) and adapt the following compose
+file:
+
+```yaml
+volumes:
+  persistence:
+    driver: local
+  tls:
+    driver: local
+
+services:
+  mosquitto:
+    image: efrecon/mosquitto:1.5.5
+    volumes:
+      - persistence:/mosquitto/data
+      - tls:/mosquitto/config/security
+    environment:
+      - MOSQUITTO_INCLUDE_DIR=/mosquitto/config/sections/
+      - MOSQUITTO__PERSISTENCE__AUTOSAVE_ON_CHANGES=true
+      - MOSQUITTO__PERSISTENCE__AUTOSAVE_INTERVAL=100
+      - MOSQUITTO__PERSISTENCE__PERSISTENCE=true
+      - MOSQUITTO__PERSISTENCE__PERSISTENCE_LOCATION=/mosquitto/data/
+      - MOSQUITTO__LOGGING__LOG_DEST=stderr
+      - MOSQUITTO__EXTRA__LISTENER=8883
+      - MOSQUITTO__EXTRA__CAPATH=/etc/ssl/certs/
+      - MOSQUITTO__EXTRA__KEYFILE=/mosquitto/config/security/yourhostname.key
+      - MOSQUITTO__EXTRA__CERTFILE=/mosquitto/config/security/yourhostname.crt
+    ports:
+      -
+        target: 8883
+        published: 8883
+        protocol: tcp
+        mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "10"
+    deploy:
+      restart_policy:
+        delay: 10s
+        max_attempts: 10
+        window: 60s
+      replicas: 1
+```
+
+This can be combined with an auto-renewing reverse proxy such as [caddy] to
+protect access to your mosquitto container using certificates from
+[Let's Encrypt][LE]. You will then have to share the volume where [caddy]
+stores handshaked certificates with your mosquitto container and adapt the
+path to access the key and certificate.
+
+  [caddy]: https://caddyserver.com/
+  [LE]: https://letsencrypt.org/
 
 ## Automated Builds
 
