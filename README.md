@@ -220,7 +220,7 @@ library. Currently, version discovery uses scraping of the docker hub.
 
   [hooks]: https://github.com/efrecon/docker-mosquitto/tree/master/hooks
 
-## Implemenation
+## Implementation
 
 All substitution and slicing occurs from [docker-entrypoint.sh]. Substitution in
 the various configuration files occurs at the shell level. Slicing the main
