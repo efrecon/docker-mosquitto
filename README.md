@@ -1,6 +1,6 @@
 # mosquitto
 
-These Docker [images] behaves almost exactly as the official Eclipse [mosquitto]
+These Docker [images] behave almost exactly as the official Eclipse [mosquitto]
 server [images][official], while providing easy configuration of most parameters
 through environment variables. They are also ready for TLS connections using
 [official][rootCA] root certificates out-of-the-box. Finally, whenever relevant
@@ -215,11 +215,13 @@ path to access the key and certificate.
   [caddy]: https://caddyserver.com/
   [LE]: https://letsencrypt.org/
 
-### Configuring the Entrypoint
+## Configuring the Entrypoint
 
 The entrypoint itself can be configured either by command-line options, or
 through environment variables, all starting with `MQ_`. Command-line options
-have precedence over environment variables.
+have precedence over environment variables. The image default is to provide
+feedback about the transformations applied by this implementation through
+setting the `--verbose` flag.
 
 ## Reloading
 
