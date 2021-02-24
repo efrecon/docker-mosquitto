@@ -11,5 +11,5 @@ RUN apk --no-cache add tcl ca-certificates tini && \
 # Install tweaking
 COPY *.tcl *.sh /
 
-ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh", "/usr/sbin/mosquitto"]
+ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh", "--verbose", "--", "/usr/sbin/mosquitto"]
 CMD ["-c", "/mosquitto/config/mosquitto.conf"]

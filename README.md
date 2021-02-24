@@ -211,6 +211,34 @@ path to access the key and certificate.
   [caddy]: https://caddyserver.com/
   [LE]: https://letsencrypt.org/
 
+### Configuring the Entrypoint
+
+The entrypoint itself can be configured either by command-line options, or
+through environment variables, all starting with `MQ_`. Command-line options
+have precedence over environment variables.
+
+## Reloading
+
+When running with sectioning, which is triggered by setting the environment
+variable `MOSQUITTO_INCLUDE_DIR`, this implementation is able to detect changes
+in files that are pointed at by the configuration, e.g. password file, server
+certificate or key, etc. This is controlled by the command-line option
+`--watcher` to the entrypoint (or the environment variable `MQ_WATCHER`); a good
+default which should work in most cases is provided.
+
+The implementation will look into the sectioned configuration files for the
+values of known configuration parameters and, for each, start a process that
+will watch the file pointed at by the parameter for changes. When the file
+changes, the `SIGHUP` process is sent to mosquitto, which will then reload its
+configuration.
+
+File watching is implemented using [`watch.sh`][watch], signalling using
+[`signal.sh`][signal]. The signalling implementation will actively look for a
+probable process if the PID file does not exist.
+
+  [watch]: ./watch.sh
+  [signal]: ./signal.sh
+
 ## Automated Builds
 
 Builds will happen automatically for all current and future versions of the

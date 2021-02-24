@@ -6,9 +6,13 @@ volumes:
 
 services:
   mosquitto:
-    image: efrecon/mosquitto:1.5.5
+    build:
+      context: ..
+      args:
+        - MOSQUITTO_VERSION=1.5.5
     volumes:
       - persistence:/mosquitto/data
+      - ./topics.acl:/mosquitto/config/topics.acl
     environment:
       - MOSQUITTO_INCLUDE_DIR=/mosquitto/config/sections/
       - MOSQUITTO__PERSISTENCE__AUTOSAVE_ON_CHANGES=true
@@ -16,6 +20,9 @@ services:
       - MOSQUITTO__PERSISTENCE__PERSISTENCE=true
       - MOSQUITTO__PERSISTENCE__PERSISTENCE_LOCATION=/mosquitto/data/
       - MOSQUITTO__LOGGING__LOG_DEST=stderr
+      - MOSQUITTO__LOGGING__LOG_TIMESTAMP=true
+      - MOSQUITTO__LOGGING__LOG_TYPE=all
+      - MOSQUITTO__SECURITY__ACL_FILE=/mosquitto/config/topics.acl
     ports:
       -
         target: 1883
@@ -29,7 +36,10 @@ services:
         max-file: "10"
     deploy:
       restart_policy:
+        condition: on-failure
         delay: 10s
         max_attempts: 10
         window: 60s
       replicas: 1
+    command: >-
+      -c /mosquitto/config/mosquitto.conf -v

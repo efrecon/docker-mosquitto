@@ -2,9 +2,9 @@
 
 
 if [ -t 1 ]; then
-    INTERACTIVE=1
+  WATCH_INTERACTIVE=${WATCH_INTERACTIVE:-1}
 else
-    INTERACTIVE=0
+  WATCH_INTERACTIVE=${WATCH_INTERACTIVE:-0}
 fi
 
 # All (good?) defaults
@@ -22,8 +22,7 @@ appname=${cmdname%.*}
 # Print usage on stderr and exit
 usage() {
   exitcode="$1"
-  msg=${2:-}
-  [ -n "$msg" ] && echo "$msg" >&2
+  [ "$#" -gt "1" ] && error "$2"
   cat << USAGE >&2
 
 Synopsis:
@@ -53,48 +52,48 @@ USAGE
 
 # Parse options
 while [ $# -gt 0 ]; do
-    case "$1" in
-        -f | --file | --path)
-            WATCH_PATH=$2; shift 2;;
-        --file=* | --path=*)
-            WATCH_PATH="${1#*=}"; shift 1;;
+  case "$1" in
+    -f | --file | --path)
+      WATCH_PATH=$2; shift 2;;
+    --file=* | --path=*)
+      WATCH_PATH="${1#*=}"; shift 1;;
 
-        -p | --period)
-            WATCH_PERIOD=$2; shift 2;;
-        --period=*)
-            WATCH_PERIOD="${1#*=}"; shift 1;;
+    -p | --period)
+      WATCH_PERIOD=$2; shift 2;;
+    --period=*)
+      WATCH_PERIOD="${1#*=}"; shift 1;;
 
-        -v | --verbose)
-            WATCH_VERBOSE=1; shift 1;;
+    -v | --verbose)
+      WATCH_VERBOSE=1; shift 1;;
 
-        -c | --command)
-            WATCH_COMMAND=$2; shift 2;;
-        --command=*)
-            WATCH_COMMAND="${1#*=}"; shift 1;;
+    -c | --command)
+      WATCH_COMMAND=$2; shift 2;;
+    --command=*)
+      WATCH_COMMAND="${1#*=}"; shift 1;;
 
-        --with-arg)
-            WATCH_WITHARG=1; shift 1;;
+    --with-arg)
+      WATCH_WITHARG=1; shift 1;;
 
-        --content)
-            WATCH_CONTENT=1; shift 1;;
+    --content)
+      WATCH_CONTENT=1; shift 1;;
 
-        -\? | -h | --help)
-            usage 0;;
-        --)
-            shift; break;;
-        -*)
-            echo "Unknown option: $1 !" >&2 ; usage 1;;
-    esac
+    -\? | -h | --help)
+      usage 0;;
+    --)
+      shift; break;;
+    -*)
+      echo "Unknown option: $1 !" >&2 ; usage 1;;
+  esac
 done
 
 # Colourisation support for logging and output.
 _colour() {
-    if [ "$INTERACTIVE" = "1" ]; then
-        # shellcheck disable=SC2086
-        printf '\033[1;31;'${1}'m%b\033[0m' "$2"
-    else
-        printf -- "%b" "$2"
-    fi
+  if [ "$WATCH_INTERACTIVE" = "1" ]; then
+    # shellcheck disable=SC2086
+    printf '\033[1;31;'${1}'m%b\033[0m' "$2"
+  else
+    printf -- "%b" "$2"
+  fi
 }
 green() { _colour "32" "$1"; }
 red() { _colour "40" "$1"; }
@@ -103,13 +102,17 @@ blue() { _colour "34" "$1"; }
 
 # Conditional logging
 log() {
-    if [ "$WATCH_VERBOSE" = "1" ]; then
-        echo "[$(blue "$appname")] [$(yellow info)] [$(date +'%Y%m%d-%H%M%S')] $1" >&2
-    fi
+  if [ "$WATCH_VERBOSE" = "1" ]; then
+    echo "[$(blue "$appname")] [$(green info)] [$(date +'%Y%m%d-%H%M%S')] $1" >&2
+  fi
 }
 
 warn() {
-    echo "[$(blue "$appname")] [$(red WARN)] [$(date +'%Y%m%d-%H%M%S')] $1" >&2
+  echo "[$(blue "$appname")] [$(yellow WARN)] [$(date +'%Y%m%d-%H%M%S')] $1" >&2
+}
+
+error() {
+  echo "[$(blue "$appname")] [$(red ERROR)] [$(date +'%Y%m%d-%H%M%S')] $1" >&2
 }
 
 if [ -z "$WATCH_PATH" ]; then
@@ -134,7 +137,12 @@ filestat() {
 
 LTIME=$(filestat)
 LSUM=
-[ "$WATCH_CONTENT" = "1" ] && LSUM=$(filesum)
+if [ "$WATCH_CONTENT" = "1" ]; then
+  log "Watching content of $WATCH_PATH and calling $WATCH_COMMAND on changes"
+  LSUM=$(filesum)
+else
+  log "Watching activity on $WATCH_PATH and calling $WATCH_COMMAND on changes"
+fi
 while true; do
   sleep "$WATCH_PERIOD"
   ATIME=$(filestat)
