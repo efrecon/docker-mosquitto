@@ -1,13 +1,17 @@
 # mosquitto
 
-These images behaves almost exacly as the official Eclipse [mosquitto] server
-[images], while providing easy configuration of most parameters through
-environment variables. They are also ready for TLS connections using [official]
-root certificates out-of-the-box.
+These Docker [images] behaves almost exactly as the official Eclipse [mosquitto]
+server [images][official], while providing easy configuration of most parameters
+through environment variables. They are also ready for TLS connections using
+[official][rootCA] root certificates out-of-the-box. Finally, whenever relevant
+files pointed at by the Mosquitto configuration [change](#reloading), this
+implementation will [arrange](#reloading) for mosquitto to reload its
+configuration to take the changes into account.
 
+  [images]: https://hub.docker.com/r/efrecon/mosquitto
   [mosquitto]: https://eclipse.org/mosquitto
-  [images]: https://hub.docker.com/_/eclipse-mosquitto/
-  [official]: https://wiki.mozilla.org/CA/Included_Certificates
+  [official]: https://hub.docker.com/_/eclipse-mosquitto/
+  [rootCA]: https://wiki.mozilla.org/CA/Included_Certificates
 
 ## Simpler Cases
 
@@ -220,17 +224,18 @@ have precedence over environment variables.
 ## Reloading
 
 When running with sectioning, which is triggered by setting the environment
-variable `MOSQUITTO_INCLUDE_DIR`, this implementation is able to detect changes
-in files that are pointed at by the configuration, e.g. password file, server
-certificate or key, etc. This is controlled by the command-line option
-`--watcher` to the entrypoint (or the environment variable `MQ_WATCHER`); a good
-default which should work in most cases is provided.
+variable `MOSQUITTO_INCLUDE_DIR` or setting the configuration parameter
+`include_dir`, this implementation is able to detect changes in files that are
+pointed at by the configuration, e.g. password file, server certificate or key,
+etc. This is controlled by the command-line option `--watcher` to the entrypoint
+(or the environment variable `MQ_WATCHER`); a good default that should work in
+most cases is provided.
 
 The implementation will look into the sectioned configuration files for the
 values of known configuration parameters and, for each, start a process that
 will watch the file pointed at by the parameter for changes. When the file
 changes, the `SIGHUP` process is sent to mosquitto, which will then reload its
-configuration.
+configuration (see section about signals in the [manual]).
 
 File watching is implemented using [`watch.sh`][watch], signalling using
 [`signal.sh`][signal]. The signalling implementation will actively look for a
@@ -238,15 +243,18 @@ probable process if the PID file does not exist.
 
   [watch]: ./watch.sh
   [signal]: ./signal.sh
+  [manual]: https://mosquitto.org/man/mosquitto-8.html
 
 ## Automated Builds
 
 Builds will happen automatically for all current and future versions of the
 official [images] by the way of the scripts in the [hooks] directory. This means
 that versioning and tagging of these images will match the official Docker
-library. Currently, version discovery uses scraping of the docker hub.
+library. Currently, version discovery is based on [reg-tags], a shell library
+present as a submodule to this repository.
 
   [hooks]: https://github.com/efrecon/docker-mosquitto/tree/master/hooks
+  [reg-tags]: https://github.com/efrecon/reg-tags
 
 ## Implementation
 
@@ -257,5 +265,12 @@ implemented in the Tcl script [slicer.tcl]. The script is called twice, once for
 detecting the location of the include directory, and a second time to create the
 various sub-section files.
 
+Configuration of the entrypoint can occur through environment variables starting
+with `MQ_`. The value of these variables is also used in the processes that are
+started from the entrypoint to watch relevant files for changes. The entire
+process tree forming the implementation is placed under the control of [tini] to
+ease garbage collection of processes when containers are killed or stopped.
+
   [docker-entrypoint.sh]: https://github.com/efrecon/docker-mosquitto/blob/master/docker-entrypoint.sh
   [slicer.tcl]: https://github.com/efrecon/docker-mosquitto/blob/master/slicer.tcl
+  [tini]: https://github.com/krallin/tini

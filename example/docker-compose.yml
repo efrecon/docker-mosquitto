@@ -21,7 +21,6 @@ services:
       - MOSQUITTO__PERSISTENCE__PERSISTENCE_LOCATION=/mosquitto/data/
       - MOSQUITTO__LOGGING__LOG_DEST=stderr
       - MOSQUITTO__LOGGING__LOG_TIMESTAMP=true
-      - MOSQUITTO__LOGGING__LOG_TYPE=all
       - MOSQUITTO__SECURITY__ACL_FILE=/mosquitto/config/topics.acl
     ports:
       -
@@ -42,4 +41,4 @@ services:
         window: 60s
       replicas: 1
     command: >-
-      -c /mosquitto/config/mosquitto.conf -v
+      -c /mosquitto/config/mosquitto.conf
