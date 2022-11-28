@@ -171,6 +171,16 @@ if [ -n "$INCL" ]; then
     fi
   done
 
+  # Check if a topic configuration file is declared
+  if [ ! -z "${TOPICS_FILE}" ]; then
+    # Only allow bulk topic setting when there is no explicit bridge topic set
+    if [ -z "${MOSQUITTO__BRIDGES__TOPIC}" ]; then
+      ("${dirname%/}/bridge-topic.sh" "${TOPICS_FILE}")
+    else
+      log "Bridge Topic already set! Skipping topic list configuration"
+    fi
+  fi
+
   # If slicing was performed, pursue watching relevant files for changes
   if [ -n "$MQ_WATCHER" ]; then
     # Look for a PID file, or force one. Note that even if we force a PID file,
