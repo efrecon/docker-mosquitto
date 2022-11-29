@@ -176,7 +176,7 @@ if [ -n "$INCL" ]; then
     # Only allow bulk topic setting when there is no explicit bridge topic set
     if [ -z "${MOSQUITTO__BRIDGES__TOPIC}" ]; then
       BRIDGE_CONF_FILE=${INCL%/}/bridges.conf
-      "${dirname%/}/bridge-topic.sh" "${TOPICS_FILE}" "${BRIDGE_CONF_FILE}"
+      ("${dirname%/}/bridge-topic.sh" "${TOPICS_FILE}" "${BRIDGE_CONF_FILE}")
     else
       warn "Bridge Topic already set! Skipping topic list configuration"
     fi
