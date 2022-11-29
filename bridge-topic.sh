@@ -39,7 +39,6 @@ function setTopics() {
         ' "${3}"
 }
 
-
 ### Map arguments to meaningful variables
 TOPICS_FILE="$1"
 BRIDGE_CONF_FILE="$2"
