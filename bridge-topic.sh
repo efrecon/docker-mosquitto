@@ -46,14 +46,10 @@ function setTopics() {
 }
 
 if [ -z "${TOPICS_FILE}" ]; then
-    # echo "Topic file env variable not set!" 1>&2
-    # exit 1
     handleError "Topic file env variable not set!"
 fi
 
 if [ ! -f "${TOPICS_FILE}" ]; then
-    # echo "Topic file not found!" 1>&2
-    # exit 1
     handleError "Topic file not found!"
 fi
 
@@ -61,8 +57,6 @@ fi
 LAST_TOPIC=$(tail -1 "${TOPICS_FILE}")
 
 if [ -z "${LAST_TOPIC}" ]; then
-    # echo "No topics found!" 1>&2
-    # exit 1
     handleError "No topics found!"
 fi
 
