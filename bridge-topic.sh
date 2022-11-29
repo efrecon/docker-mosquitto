@@ -9,24 +9,14 @@
 ###     $1 → The topic list file
 ###     $2 → The configuration file to update
 
-# Colourisation support for logging and output.
-function _colour() {
-    if [ "$MQ_INTERACTIVE" = "1" ]; then
-        # shellcheck disable=SC2086
-        printf '\033[1;31;'${1}'m%b\033[0m' "$2"
-    else
-        printf -- "%b" "$2"
-    fi
-}
-function red() { _colour "40" "$1"; }
-function blue() { _colour "34" "$1"; }
+source ./logger.sh
 
 ###
 ### Accepted Arguments
 ###     $1 → Error Message
 ###
 function handleError() {
-    echo "[$(blue bridge-topic)] [$(red ERROR)] [$(date +'%Y%m%d-%H%M%S')] $1" >&2
+    error "${1}"
     exit 1
 }
 
@@ -37,10 +27,6 @@ function handleError() {
 ###     $3 → The target configuration file
 ###
 function setTopics() {
-
-    echo "🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧"
-    echo "🚧🚧🚧BRIDGE_CONF_FILE: ${3}"
-    echo "🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧"
     ### Add remove everything between the '#topic' and the next config section
     sed -i -e '/^#topic/,/^# .*/{/^#topic/!{/^# .*/!d;};}' "${3}"
 
