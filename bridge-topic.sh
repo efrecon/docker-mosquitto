@@ -51,7 +51,7 @@ if [ -z "${BRIDGE_CONF_FILE}" ]; then
     handleError "Configuration file env variable not set!"
 fi
 
-if [ ! -f "${BRIDGE_CONF_FILE}"]; then
+if [ ! -f "${BRIDGE_CONF_FILE}" ]; then
     handleError "Target configuration file not found!"
 fi
 
