@@ -11,13 +11,21 @@
 
 source ./logger.sh
 
+### Exit codes
+TOPIC_NOT_SET_CODE=41
+BRIDGE_CONF_NOT_SET_CODE=42
+BRIDGE_CONF_FILE_NOT_FOUND_CODE=43
+TOPIC_FILE_NOT_FOUND_CODE=44
+TOPIC_EMPTY_CODE=45
+
 ###
 ### Accepted Arguments
 ###     $1 → Error Message
+###     $2 → The exit code
 ###
 function handleError() {
     error "${1}"
-    exit 1
+    exit $2
 }
 
 ###
@@ -44,26 +52,26 @@ TOPICS_FILE="$1"
 BRIDGE_CONF_FILE="$2"
 
 if [ -z "${TOPICS_FILE}" ]; then
-    handleError "Topic file env variable not set!"
+    handleError "Topic file env variable not set!" $TOPIC_NOT_SET_CODE
 fi
 
 if [ -z "${BRIDGE_CONF_FILE}" ]; then
-    handleError "Configuration file env variable not set!"
+    handleError "Configuration file env variable not set!" $BRIDGE_CONF_NOT_SET_CODE
 fi
 
 if [ ! -f "${BRIDGE_CONF_FILE}" ]; then
-    handleError "Target configuration file not found!"
+    handleError "Target configuration file not found!" $BRIDGE_CONF_FILE_NOT_FOUND_CODE
 fi
 
 if [ ! -f "${TOPICS_FILE}" ]; then
-    handleError "Topic file not found!"
+    handleError "Topic file not found!" $TOPIC_FILE_NOT_FOUND_CODE
 fi
 
 ## Get the last topic from the topics file
 LAST_TOPIC=$(tail -1 "${TOPICS_FILE}")
 
 if [ -z "${LAST_TOPIC}" ]; then
-    handleError "No topics found!"
+    handleError "No topics found!" $TOPIC_EMPTY_CODE
 fi
 
 setTopics "${LAST_TOPIC}" "${TOPICS_FILE}" "${BRIDGE_CONF_FILE}"
