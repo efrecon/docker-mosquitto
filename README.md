@@ -39,7 +39,7 @@ Only the `$SYS` topic will be set overwritting the previous `#` topic set.
 
 Additional work was done to make it suitable for a use case: MQTT server running in bridge mode.
 
-We've made the `dokcer-mosquitto` be able to accept file path containing topics. This way, the user can set the topics they want and Mosquitto will accept them so long as they follow the topic rules (`topic pattern [[[ out | in | both ] qos-level] local-prefix remote-prefix]`) which can be found in the Mosquitto manual.
+We've made the `docker-mosquitto` be able to accept file path containing topics. This way, the user can set the topics they want and Mosquitto will accept them so long as they follow the topic rules (`topic pattern [[[ out | in | both ] qos-level] local-prefix remote-prefix]`) which can be found in the Mosquitto manual.
 
 ## Usage
 
@@ -49,7 +49,7 @@ Single topics can be set by following the [base docker-mosquitto guide](/core.re
 
 ### Setting multiple bridge topics
 
-To set multiple bridge topics, only a topic list file (`topic-list`) _with content_ is necessary. It is also important to **not have the `MOSQUITTO__BRIDGES__TOPIC` configuration set** as well.
+To set multiple bridge topics, only a topic list file (`topic-list`) _with content_ is necessary. It is also important to **NOT have the `MOSQUITTO__BRIDGES__TOPIC` configuration set** as well.
 
 1. Create a topic list file
 2. Pass it as a volume in Docker
