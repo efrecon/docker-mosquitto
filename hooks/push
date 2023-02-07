@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 
+# Set good defaults to allow script to be run by hand. The two variables below
+# will never be used when run from within the Docker hub.
+DOCKER_REPO=${DOCKER_REPO:-"efrecon/mosquitto"}
+SOURCE_COMMIT=${SOURCE_COMMIT:-$(git log --no-decorate|grep '^commit'|head -n 1| awk '{print $2}')}
+
 im="eclipse-mosquitto"
 
 # shellcheck disable=SC1090
