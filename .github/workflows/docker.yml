@@ -68,7 +68,7 @@ jobs:
         # Note: This uses the password, not the token as this action would
         # otherwise not work.
         name: Update repo description at Docker Hub
-        uses: peter-evans/dockerhub-description@v2
+        uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
