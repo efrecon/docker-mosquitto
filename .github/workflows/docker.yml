@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - master
-      - feature/gh-workflows
+      - feature/gh-workflow
   schedule:
     - cron: "0 0 * * *"
 
