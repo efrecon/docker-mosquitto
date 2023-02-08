@@ -1,14 +1,16 @@
 # mosquitto
 
-These Docker [images] behave almost exactly as the official Eclipse [mosquitto]
-server [images][official], while providing easy configuration of most parameters
-through environment variables. They are also ready for TLS connections using
-[official][rootCA] root certificates out-of-the-box. Finally, whenever relevant
-files pointed at by the Mosquitto configuration [change](#reloading), this
-implementation will [arrange](#reloading) for mosquitto to reload its
-configuration to take the changes into account.
+These Docker [images] (also at the [GHCR]) behave almost exactly as the official
+Eclipse [mosquitto] server [images][official], while providing easy
+configuration of most parameters through environment variables. They are also
+ready for TLS connections using [official][rootCA] root certificates
+out-of-the-box. Finally, whenever relevant files pointed at by the Mosquitto
+configuration [change](#reloading), this implementation will
+[arrange](#reloading) for mosquitto to reload its configuration to take the
+changes into account.
 
   [images]: https://hub.docker.com/r/efrecon/mosquitto
+  [GHCR]: https://github.com/efrecon/docker-mosquitto/pkgs/container/mosquitto
   [mosquitto]: https://eclipse.org/mosquitto
   [official]: https://hub.docker.com/_/eclipse-mosquitto/
   [rootCA]: https://wiki.mozilla.org/CA/Included_Certificates
