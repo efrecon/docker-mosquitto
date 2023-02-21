@@ -43,6 +43,14 @@ We've made the `docker-mosquitto` be able to accept file path containing topics.
 
 ## Usage
 
+### Build for use with the Vocovo Edge Broker
+
+```shell
+docker build -t vocovo/docker-mosquitto:latest .
+```
+
+To build a custom version add `--build-arg MOSQUITTO_VERSION=1.5.11`
+
 ### Setting single bridge topics
 
 Single topics can be set by following the [base docker-mosquitto guide](/core.readme.md#using-from-compose).
