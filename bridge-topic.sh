@@ -43,7 +43,7 @@ function setTopics() {
 
     ### Append a space after the last topic inserted
     sed -i "\|^${1}|"'a \
-        
+
         ' "${3}"
 }
 

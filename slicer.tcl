@@ -61,7 +61,7 @@ proc sliceConf { src { dst "" } { dir "" } } {
                 } elseif { $dst_fd ne "" } {
                     foreach l $hdr {
                         puts $dst_fd $l
-                    }                    
+                    }
                 }
                 set hdr [list];  # Section has ended, remember this!
             } elseif { [string index $line 0] eq [dict get $::options -comment] } {
@@ -135,7 +135,7 @@ if { $i >= 0 } {
     } else {
         set opts [list]
     }
-    set argv [lrange $argv $i end]    
+    set argv [lrange $argv $i end]
 }
 
 # Quick options parser
