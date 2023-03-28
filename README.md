@@ -1,5 +1,9 @@
 # Docker-Mosquitto
 
+⚠️⚠️ Beware: This repo is public. Be careful what changes you commit!! ⚠️⚠️
+
+---
+
 **Docker-Mosquitto** is a Docker image providing a convenience wrapper on top of [Mosquitto]. It is supports setting Mosquitto [configuration] via environment variables that can then be passed via Docker (and Docker Compose).
 
 [mosquitto]: https://eclipse.org/mosquitto
